@@ -62,6 +62,7 @@ function M.showInfo(cnt,count,cbFn)
 end
 
 function M.showSensorValues()
+     init_OLED(1,2)
      --LeweiMqtt.appendSensorValue("dust",123)
      --LeweiMqtt.appendSensorValue("AQI",235)
      --LeweiMqtt.appendSensorValue("dust10",130)

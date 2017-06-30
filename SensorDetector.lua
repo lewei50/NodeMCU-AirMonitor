@@ -2,11 +2,14 @@ local moduleName = "SensorDetector"
 local M = {}
 _G[moduleName] = M
 
+
+
 local enablePMSPin = 4
 local uartTimer = tmr.create()
 local rcv = ""
 bIsPms5003 = false
 bIsPms5003s = false
+bExistSi7021 = false
 
 
 function M.stopAllOutPut()
@@ -26,7 +29,33 @@ function M.startAllOutPut()
      gpio.write(enablePMSPin,gpio.HIGH)
 end
 
+function M.detectSi7021()
+     local si7021 = require("si7021")
+	SDA_PIN = 5 -- sda pin
+	SCL_PIN = 6 -- scl pin
+	
+	si7021.init(SDA_PIN, SCL_PIN)
+	si7021.read(OSS)
+	Hum = si7021.getHumidity()
+	Temp = si7021.getTemperature()
+	--print(Temp)
+	if(Hum~=nil)then
+		LeweiMqtt.appendSensorValue("H1",Hum)
+          LeweiMqtt.appendSensorValue("T1",Temp)
+          OLED.showSensorValues()
+		bExistSi7021 = true	
+          si7021Timer = tmr.create()
+          si7021Timer:register(2000, tmr.ALARM_SINGLE, function()
+               M.detectSi7021()
+          end)
+          si7021Timer:start()
+     else
+          si7021 = nil
+	end
+end
+
 function M.detectSensor()
+     M.detectSi7021()
      M.startAllOutPut()
      M.enablUart()
 end

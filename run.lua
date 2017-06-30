@@ -16,10 +16,10 @@ for i,v in pairs(sensors) do
      index = index + 1
      print(i,v,index,count)
      if(index == count) then
-     print("S")
+     --print("S")
           LeweiMqtt.sendSensorValue(i,v)
      else
-     print("A")
+     --print("A")
           LeweiMqtt.appendSensorValue(i,v)
      end
 end
