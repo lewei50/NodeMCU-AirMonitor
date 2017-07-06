@@ -7,7 +7,7 @@ local infoTime = 0
 local callbackFn = nil
 local showSensorValues = false
 
-function init_OLED(sda,scl) --Set up the u8glib lib
+function M.init_OLED(sda,scl) --Set up the u8glib lib
      sla = 0x3c
      i2c.setup(0, sda, scl, i2c.SLOW)
      disp = u8g.sh1106_128x64_i2c(sla)
@@ -17,7 +17,7 @@ function init_OLED(sda,scl) --Set up the u8glib lib
      disp:setDefaultForegroundColor()
      disp:setFontPosTop()
 end
-init_OLED(1,2) --Run setting up
+M.init_OLED(1,2) --Run setting up
 
 rfreshtimer = tmr.create()
 rfreshtimer:register(1000, tmr.ALARM_AUTO, function() 
@@ -62,11 +62,14 @@ function M.showInfo(cnt,count,cbFn)
 end
 
 function M.showSensorValues()
-     init_OLED(1,2)
+     --init_OLED(1,2)
      --LeweiMqtt.appendSensorValue("dust",123)
      --LeweiMqtt.appendSensorValue("AQI",235)
      --LeweiMqtt.appendSensorValue("dust10",130)
      --LeweiMqtt.appendSensorValue("H1",50)
+     sla = 0x3c
+     i2c.setup(0, 1, 2, i2c.SLOW)
+     
      sensors = LeweiMqtt.getSensorValues()
      disp:firstPage()
      

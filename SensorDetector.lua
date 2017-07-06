@@ -30,6 +30,7 @@ function M.startAllOutPut()
 end
 
 function M.detectSi7021()
+     --print("detectSi7021")
      local si7021 = require("si7021")
 	SDA_PIN = 5 -- sda pin
 	SCL_PIN = 6 -- scl pin
@@ -39,23 +40,23 @@ function M.detectSi7021()
 	Hum = si7021.getHumidity()
 	Temp = si7021.getTemperature()
 	--print(Temp)
-	if(Hum~=nil)then
+	if(Temp~=nil)then
 		LeweiMqtt.appendSensorValue("H1",Hum)
           LeweiMqtt.appendSensorValue("T1",Temp)
           OLED.showSensorValues()
 		bExistSi7021 = true	
-          si7021Timer = tmr.create()
-          si7021Timer:register(2000, tmr.ALARM_SINGLE, function()
-               M.detectSi7021()
-          end)
-          si7021Timer:start()
      else
           si7021 = nil
 	end
 end
 
 function M.detectSensor()
-     M.detectSi7021()
+          si7021Timer = tmr.create()
+          si7021Timer:register(2000, tmr.ALARM_AUTO, function()
+               M.detectSi7021()
+          end)
+          si7021Timer:start()
+          OLED.init_OLED(1,2)
      M.startAllOutPut()
      M.enablUart()
 end

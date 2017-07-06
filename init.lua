@@ -1,5 +1,5 @@
-require("SensorDetector")
 require("Oled")
+require("SensorDetector")
 require("keyDetector")
 KeyDetector.enableTrig()
 
