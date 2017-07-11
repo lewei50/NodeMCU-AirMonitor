@@ -85,27 +85,33 @@ end
 function M.resolveData(data)
      --print("resolveData"..data)
      --Socket.send(data)
-     if((string.byte(data,1)==0x42) and(string.byte(data,2)==0x4d) and string.byte(data,13)~=nil and string.byte(data,14)~=nil)  then
-          pm25 = (string.byte(data,13)*256+string.byte(data,14))
+     if((((string.byte(data,1)==0x42) and(string.byte(data,2)==0x4d)) or ((string.byte(data,1)==0x32) and(string.byte(data,2)==0x3d))) and string.byte(data,13)~=nil and string.byte(data,14)~=nil)  then
+          
+          if((string.byte(data,1)==0x32) and(string.byte(data,2)==0x3d)) then
+               --Teetc.com
+               pm25 = (string.byte(data,7)*256+string.byte(data,8))
+          else
+               pm25 = (string.byte(data,13)*256+string.byte(data,14))
+               if(string.byte(data,29) ~=nil and string.byte(data,30)~=nil)then
+                    if(string.byte(data,29) == 0x71)then
+                         hcho = nil
+                         bIsPms5003 = true
+                         bIsPms5003s = false
+                         --OLED.showInfo("pm5003:"..pm25,2)
+                    else
+                         bIsPms5003 = false
+                         bIsPms5003s = true
+                         --OLED.showInfo("pm5003s:"..pm25,2)
+                         hcho = (string.byte(data,29)*256+string.byte(data,30))/1000
+                         LeweiMqtt.appendSensorValue("HCHO",hcho)
+                         --Socket.send(hcho)
+                         --Socket.send(type(LeweiMqtt.getSensorValues())..node.heap().."\n\r")
+                    end
+               end
+          end
           aqi,result = M.calcAQI(pm25)
           LeweiMqtt.appendSensorValue("dust",pm25)
           LeweiMqtt.appendSensorValue("AQI",aqi)
-          if(string.byte(data,29) ~=nil and string.byte(data,30)~=nil)then
-               if(string.byte(data,29) == 0x71)then
-                    hcho = nil
-                    bIsPms5003 = true
-                    bIsPms5003s = false
-                    --OLED.showInfo("pm5003:"..pm25,2)
-               else
-                    bIsPms5003 = false
-                    bIsPms5003s = true
-                    --OLED.showInfo("pm5003s:"..pm25,2)
-                    hcho = (string.byte(data,29)*256+string.byte(data,30))/1000
-                    LeweiMqtt.appendSensorValue("HCHO",hcho)
-                    --Socket.send(hcho)
-                    --Socket.send(type(LeweiMqtt.getSensorValues())..node.heap().."\n\r")
-               end
-          end
           OLED.showSensorValues()
           --OLED.showInfo("pm5003s:",2)
      else
